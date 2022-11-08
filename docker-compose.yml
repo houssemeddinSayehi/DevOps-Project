@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  mysqldb:
+
+    image: mysql
+    container_name: mysqlcicd
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tpachato1
+    ports:
+      - "3306:3306"
+
+  app:
+    depends_on:
+      - mysqldb
+    image: houssemsy/tpachatproject
+    container_name: houssemspring
+    restart: on-failure
+    ports:
+      - "8089:8089"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:mysql://mysqlcicd:3306/tpachato1?allowPublicKeyRetrieval=true&useSSL=false",
+        "spring.datasource.username" : "root",
+        "spring.datasource.password" : "root",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5InnoDBDialect",
+        "spring.jpa.hibernate.ddl-auto" : "update"
+      }'
